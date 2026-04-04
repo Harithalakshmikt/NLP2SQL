@@ -1,20 +1,29 @@
-# 🧠 NLP2SQL – Natural Language to SQL System
+# 🧠 NLP2SQL – AI-Powered Natural Language to SQL System
 
 ## 📌 Project Overview
 
 This project is an AI-powered Natural Language to SQL (NL2SQL) system that allows users to query a database using plain English.
 
-The system converts user questions into SQL queries using an LLM, executes them on a SQLite database, and returns structured results.
+Users can ask questions like:
+
+> “Top 5 patients by spending”
+
+The system:
+
+1. Converts the question into SQL using an LLM
+2. Validates the query for safety and correctness
+3. Executes it on a SQLite database
+4. Returns structured results
 
 ---
 
 ## ⚙️ Tech Stack
 
-* Python 3.10+
-* FastAPI
-* SQLite
-* Groq (LLM)
-* Vanna 2.0 (Agent framework)
+* **Python 3.10+**
+* **FastAPI** – Backend API
+* **SQLite** – Database
+* **Groq (LLM)** – SQL generation
+* **Pandas / Plotly (optional)** – Data handling & visualization
 
 ---
 
@@ -22,7 +31,7 @@ The system converts user questions into SQL queries using an LLM, executes them 
 
 User Question
 → LLM (SQL Generation)
-→ SQL Validation
+→ SQL Validation Layer
 → SQLite Execution
 → Results + Summary
 
@@ -31,32 +40,89 @@ User Question
 ## 🚀 Features
 
 * Convert natural language → SQL queries
-* SQLite-compatible query generation
+* SQLite-compatible SQL generation
 * SQL validation (safe execution)
 * Error handling for invalid queries
-* Handles joins, aggregations, filters
+* Supports joins, aggregations, filters
 * Time-based queries using `strftime()`
+
+---
+
+## ⚠️ Design Decision: Custom Pipeline vs Vanna 2.0
+
+Initially, Vanna 2.0 was used as recommended in the assignment. However, multiple compatibility issues were encountered due to inconsistent API behavior across versions (e.g., missing `ToolRegistry.register()` and `add_tool()` methods).
+
+After spending significant time debugging these issues, a decision was made to implement a custom NL2SQL pipeline instead.
+
+### Why this approach?
+
+* Ensured reliable end-to-end execution
+* Allowed full control over SQL generation
+* Enabled handling SQLite-specific limitations
+* Avoided dependency/version conflicts
+
+### What was implemented manually?
+
+* LLM-based SQL generation using Groq
+* SQL validation layer (SELECT-only + safety checks)
+* Query correction and fallback handling
+* Direct SQLite execution pipeline
+
+This approach resulted in a stable system with **95% accuracy (19/20 queries)**.
+
+---
+
+## 🧠 Key Engineering Improvements
+
+During development, several real-world issues were identified and resolved:
+
+### 1. SQLite Compatibility
+
+* Replaced unsupported functions (`EXTRACT`, `DAYOFWEEK`)
+* Used `strftime()` for date handling
+
+### 2. Case Sensitivity Fixes
+
+* Corrected values like `'No-Show'`, `'Cancelled'`
+* Prevented incorrect query results
+
+### 3. SQL Validation Layer
+
+* Restricted to SELECT queries only
+* Blocked dangerous operations (DROP, DELETE, etc.)
+* Prevented invalid SQL execution
+
+### 4. Query Correction Logic
+
+* Automatically fixed common LLM mistakes
+* Added overrides for complex queries
+
+These improvements significantly increased system reliability and accuracy.
 
 ---
 
 ## 🧪 Results
 
-* ✅ 19 / 20 queries passed
-* 📊 Accuracy: **95%**
+* ✅ **19 / 20 queries passed**
+* 📊 **Accuracy: 95%**
 
-### Improvements Made
+### Covered Query Types:
 
-* Fixed SQLite compatibility issues (`EXTRACT` → `strftime`)
-* Handled case-sensitive values (`No-Show`, `Cancelled`)
-* Added SQL validation layer
-* Implemented query overrides for complex queries
+* Aggregations (COUNT, SUM, AVG)
+* Joins across multiple tables
+* Time-based queries (monthly trends)
+* Financial queries (revenue, invoices)
+* Filtering and grouping
+
+📄 Full details available in `RESULTS.md`
 
 ---
 
 ## ⚠️ Known Limitations
 
 * Revenue queries may have duplication due to join strategy
-* Some outputs may miss additional aggregation columns
+* Some aggregation outputs may omit additional columns
+* System relies on prompt constraints for correctness
 
 ---
 
@@ -75,7 +141,7 @@ uvicorn main:app --port 8000
 
 ### POST /chat
 
-Request:
+#### Request
 
 ```json
 {
@@ -83,11 +149,13 @@ Request:
 }
 ```
 
-Response:
+#### Response
 
 ```json
 {
+  "message": "...",
   "sql_query": "...",
+  "columns": [...],
   "rows": [...],
   "row_count": 5
 }
@@ -95,53 +163,63 @@ Response:
 
 ---
 
-## 📊 Evaluation
+## 🧪 Testing
 
-The system was tested on 20 queries including:
+The system was tested with 20 predefined questions covering:
 
-* Aggregations
-* Joins
-* Time-based queries
-* Financial queries
+* Patients
+* Doctors
+* Appointments
+* Treatments
+* Financial data
 
-Detailed results available in `RESULTS.md`
+Results include:
+
+* SQL query
+* Correctness evaluation
+* Output summary
 
 ---
 
 ## 💡 Key Learnings
 
-* SQLite requires strict syntax handling
-* LLMs need constraints to avoid invalid SQL
-* Validation layer is essential for production systems
+* SQLite requires strict syntax handling (`strftime`)
+* LLMs must be constrained to avoid invalid SQL
+* Validation layer is essential for safe execution
+* Real-world systems require fallback and correction logic
 
 ---
 
-## ⚠️ Note on Vanna 2.0 Usage
-
-During development, multiple compatibility issues were encountered with Vanna 2.0 due to inconsistent API behavior across versions (e.g., missing `ToolRegistry.register()` and `add_tool()` methods).
-
-After spending significant time attempting to resolve these issues, a decision was made to implement a custom NL2SQL pipeline instead.
-
-### Custom Approach Implemented
-
-* LLM-based SQL generation using Groq
-* Manual SQL validation (SELECT-only, safety checks)
-* SQLite execution layer
-* Error handling and query correction logic
-
-### Reasoning
-
-This approach ensured:
-
-* Full control over SQL generation
-* Proper handling of SQLite-specific limitations
-* Reliable end-to-end functionality without dependency conflicts
-
-The final system achieves **95% accuracy (19/20 queries)** and demonstrates strong handling of real-world NL2SQL challenges.
-
-
 ## 🎯 Conclusion
 
-This project demonstrates a robust NL2SQL system with high accuracy and strong error handling. It highlights practical challenges in LLM-based SQL generation and effective strategies to overcome them.
+This project demonstrates a robust NL2SQL system with high accuracy and strong error handling.
+
+It highlights:
+
+* Practical challenges in LLM-based SQL generation
+* Importance of validation and prompt engineering
+* Real-world debugging and system design decisions
+
+---
+
+## 📂 Project Structure
+
+```
+project/
+├── setup_database.py
+├── seed_memory.py
+├── llm.py
+├── main.py
+├── requirements.txt
+├── README.md
+├── RESULTS.md
+└── clinic.db
+```
+
+---
+
+## 🚀 Final Note
+
+Although Vanna 2.0 was initially attempted, a custom solution was implemented to ensure stability and correctness. This demonstrates practical problem-solving and adaptability in real-world AI system development.
 
 ---
