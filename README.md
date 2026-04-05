@@ -129,10 +129,13 @@ These improvements significantly increased system reliability and accuracy.
 ## 🛠️ Setup Instructions
 
 ```bash
+python -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
 python setup_database.py
-python seed_memory.py
-uvicorn main:app --port 8000
+export GROQ_API_KEY=YOUR_API_KEY
+uvicorn main:app --host 0.0.0.0 --port 8000
+
 ```
 
 ---
@@ -207,7 +210,7 @@ It highlights:
 ```
 project/
 ├── setup_database.py
-├── seed_memory.py
+├── database.py
 ├── llm.py
 ├── main.py
 ├── requirements.txt
