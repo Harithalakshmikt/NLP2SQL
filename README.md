@@ -162,7 +162,9 @@ uvicorn main:app --host 0.0.0.0 --port 8000
   "sql_query": "...",
   "columns": [...],
   "rows": [...],
-  "row_count": 5
+  "row_count": 5,
+  "chart": null,
+  "chart_type":
 }
 ```
 
