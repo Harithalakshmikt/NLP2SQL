@@ -52,7 +52,7 @@ def chat(query: Query):
         sql = generate_sql(question)
         print("SQL:", sql)
 
-        # 🔒 Safety check
+        #  Safety check
         if not sql.lower().startswith("select"):
             return {"error": f"Only SELECT queries allowed. Got: {sql}"}
 
@@ -61,7 +61,7 @@ def chat(query: Query):
         df = pd.read_sql_query(sql, conn)
         conn.close()
 
-        # ✅ FINAL FIX → NO NaN issues
+        #  FINAL FIX → NO NaN issues
         rows = json.loads(df.to_json(orient="records"))
         columns = list(df.columns)
 
