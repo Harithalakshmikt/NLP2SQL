@@ -24,6 +24,8 @@ The system:
 * **SQLite** – Database
 * **Groq (LLM)** – SQL generation
 * **Pandas / Plotly (optional)** – Data handling & visualization
+* **python-dotenv**
+*  **Uvicorn** - To run FastAPI
 
 ---
 
