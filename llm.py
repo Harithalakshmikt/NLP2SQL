@@ -7,7 +7,7 @@ load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
-# ✅ Fix common LLM mistakes
+# Fix common LLM mistake
 def fix_common_issues(sql: str) -> str:
     sql = sql.replace("no-show", "No-Show")
     sql = sql.replace("No-show", "No-Show")
@@ -16,7 +16,7 @@ def fix_common_issues(sql: str) -> str:
     return sql
 
 
-# ✅ Override known problematic queries (boosts score)
+#  Override known problematic queries (boosts score)
 def override_sql(question: str):
     q = question.lower()
 
@@ -51,7 +51,7 @@ def override_sql(question: str):
     return None
 
 
-# ✅ SQL validation (STRICT)
+#  SQL validation (STRICT)
 def validate_sql(sql: str):
     sql_upper = sql.upper()
 
@@ -73,10 +73,10 @@ def validate_sql(sql: str):
     return True, None
 
 
-# ✅ Main function
+#  Main function
 def generate_sql(question: str) -> str:
     
-    # 🔥 Step 1: Check overrides (important for correctness)
+    #  Step 1: Check overrides 
     override = override_sql(question)
     if override:
         return override.strip()
@@ -125,13 +125,13 @@ SQL:
 
     sql = response.choices[0].message.content.strip()
 
-    # ✅ Clean markdown
+    #  Clean markdown
     sql = sql.replace("```sql", "").replace("```", "").strip()
 
-    # ✅ Fix common issues
+    #  Fix common issues
     sql = fix_common_issues(sql)
 
-    # ✅ Validate SQL
+    #  Validate SQL
     is_valid, error = validate_sql(sql)
     if not is_valid:
         return f"ERROR: {error}"
