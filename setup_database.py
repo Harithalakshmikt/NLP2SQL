@@ -20,7 +20,7 @@ DROP TABLE IF EXISTS patients;
 """)
 
 # -----------------------------
-# CREATE TABLES (as per PDF)
+# CREATE TABLES 
 # -----------------------------
 
 # Patients
@@ -167,4 +167,4 @@ for _ in range(300):
 conn.commit()
 conn.close()
 
-print("✅ Database created with full schema and dummy data!")
+print(" Database created with full schema and dummy data!")
