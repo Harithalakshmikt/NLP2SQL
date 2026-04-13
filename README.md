@@ -1,4 +1,4 @@
-# 🧠 NLP2SQL – AI-Powered Natural Language to SQL System
+# 🧠 NL2SQL – AI-Powered Natural Language to SQL System
 
 ## 📌 Project Overview
 
